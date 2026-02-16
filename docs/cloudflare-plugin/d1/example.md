@@ -4,8 +4,6 @@ D1 databases are accessed with functions and SQL instead of ORMs.
 
 The functions can then be used throughout a project, including seeding and testing.
 
-## Example
-
 `packages/core/src/index.ts`:
 ```ts
 import { z } from 'zod';

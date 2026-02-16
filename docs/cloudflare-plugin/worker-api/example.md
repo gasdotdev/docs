@@ -1,4 +1,4 @@
-# Worker API
+# Worker API Example
 
 Worker APIs use oRPC.
 
@@ -11,8 +11,6 @@ oRPC docs: https://orpc.dev/docs/getting-started
 oRPC OpenAPI docs: https://orpc.dev/docs/openapi/getting-started
 
 oRPC llms.txt: https://orpc.dev/llms.txt
-
-## Example
 
 `gas/api/src/index.ts`:
 ```ts
