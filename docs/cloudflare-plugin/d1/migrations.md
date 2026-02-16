@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS "Book" (
 );
 
 -- migrate:down
+DROP TABLE IF EXISTS "Author";
+DROP TABLE IF EXISTS "Book";
 
 ```
 
