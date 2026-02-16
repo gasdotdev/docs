@@ -16,7 +16,16 @@ A migration file contains two blocks: `-- migrate:up` and `-- migrate:down`. `--
 -- migrate:up
 PRAGMA foreign_keys=off;
 
+DROP TABLE IF EXISTS "Category";
 DROP TABLE IF EXISTS "Customer";
+DROP TABLE IF EXISTS "Product";
+DROP TABLE IF EXISTS "Order";
+
+CREATE TABLE IF NOT EXISTS "Category" (
+  "id" VARCHAR(21) PRIMARY KEY,
+  "name" VARCHAR(100) NULL,
+  "description" VARCHAR(500) NULL
+);
 
 CREATE TABLE IF NOT EXISTS "Customer" (
   "id" VARCHAR(21) PRIMARY KEY,
@@ -24,9 +33,23 @@ CREATE TABLE IF NOT EXISTS "Customer" (
   "lastName" VARCHAR(50) NULL,
   "address" VARCHAR(200) NULL,
   "city" VARCHAR(100) NULL,
+  "state" VARCHAR(100) NULL,
   "postalCode" VARCHAR(20) NULL,
-  "country" VARCHAR(100) NULL,
-  "phone" VARCHAR(30) NULL
+  "country" VARCHAR(100) NULL
+);
+
+CREATE TABLE IF NOT EXISTS "Product" (
+  "id" VARCHAR(21) PRIMARY KEY,
+  "name" VARCHAR(200) NULL,
+  "categoryId" VARCHAR(21) NOT NULL,
+  "price" DECIMAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "Order" (
+  "id" VARCHAR(21) PRIMARY KEY,
+  "customerId" VARCHAR(21) NULL,
+  "date" INTEGER NOT NULL,
+  "cost" DECIMAL NOT NULL
 );
 
 -- migrate:down
