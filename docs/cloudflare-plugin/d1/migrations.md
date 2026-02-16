@@ -2,7 +2,7 @@
 
 ## Creating Migrations
 
-You can use the D1 resource's `package.json` `migration:create` script to create a migration file. The `migrate:create` script will run the [`@gasdotdev/db`](../db-package/main.md) `gas-db create` command. An empty time-stamped migration file will be placed in the resource's `./migrations` directory.
+You can use the D1 resource's `package.json` `migration:create` script to create a migration file. The `migrate:create` script will run the [`@gasdotdev/db`](../../db-package/main.md) `gas-db create` command. An empty time-stamped migration file will be placed in the resource's `./migrations` directory.
 
 > npm run migration:create --workspace=root-db -- create_customer_table
 
