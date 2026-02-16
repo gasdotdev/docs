@@ -4,7 +4,7 @@
 
 You can use the D1 resource's `package.json` `migration:create` script to create a migration file. The `migrate:create` script will run the [`@gasdotdev/db`](../../db-package/main.md) `gas-db create` command. An empty time-stamped migration file will be placed in the resource's `./migrations` directory.
 
-> npm run migration:create --workspace=root-db -- create_customer_table
+> npm run migration:create --workspace=root-db -- create_author_table
 
 *Note: When a D1 resource is first added, an empty init migration file will be included in the installation and is ready to use (e.g. `./gas/db/migrations/20251110125013_init_migration.sql`).*
 
@@ -16,40 +16,18 @@ A migration file contains two blocks: `-- migrate:up` and `-- migrate:down`. `--
 -- migrate:up
 PRAGMA foreign_keys=off;
 
-DROP TABLE IF EXISTS "Category";
-DROP TABLE IF EXISTS "Customer";
-DROP TABLE IF EXISTS "Product";
-DROP TABLE IF EXISTS "Order";
+DROP TABLE IF EXISTS "Author";
+DROP TABLE IF EXISTS "Book";
 
-CREATE TABLE IF NOT EXISTS "Category" (
+CREATE TABLE IF NOT EXISTS "Author" (
   "id" VARCHAR(21) PRIMARY KEY,
-  "name" VARCHAR(100) NULL,
-  "description" VARCHAR(500) NULL
+  "name" VARCHAR(100) NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Customer" (
+CREATE TABLE IF NOT EXISTS "Book" (
   "id" VARCHAR(21) PRIMARY KEY,
-  "firstName" VARCHAR(50) NULL,
-  "lastName" VARCHAR(50) NULL,
-  "address" VARCHAR(200) NULL,
-  "city" VARCHAR(100) NULL,
-  "state" VARCHAR(100) NULL,
-  "postalCode" VARCHAR(20) NULL,
-  "country" VARCHAR(100) NULL
-);
-
-CREATE TABLE IF NOT EXISTS "Product" (
-  "id" VARCHAR(21) PRIMARY KEY,
-  "name" VARCHAR(200) NULL,
-  "categoryId" VARCHAR(21) NOT NULL,
-  "price" DECIMAL NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "Order" (
-  "id" VARCHAR(21) PRIMARY KEY,
-  "customerId" VARCHAR(21) NULL,
-  "date" INTEGER NOT NULL,
-  "cost" DECIMAL NOT NULL
+  "authorId" VARCHAR(21) NOT NULL,
+  "title" VARCHAR(200) NULL
 );
 
 -- migrate:down

@@ -77,7 +77,7 @@ export function res<TData>(
 }
 ```
 
-`gas/db/src/category.ts`:
+`gas/db/src/author.ts`:
 ```ts
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
@@ -88,41 +88,40 @@ import type { Result } from 'core';
 // SCHEMA
 // ==============================
 
-export const CategorySchema = z.object({
+export const AuthorSchema = z.object({
 	id: z.string(),
 	name: z.string().nullable(),
-	description: z.string().nullable(),
 });
 
 // ==============================
-// CREATE CATEGORY
+// CREATE AUTHOR
 // ==============================
 
-export const createCategoryInput = CategorySchema.omit({
+export const createAuthorInput = AuthorSchema.omit({
 	id: true,
 });
 
-export type CreateCategoryOptions = {
+export type CreateAuthorOptions = {
 	db: D1Database;
-	category: z.infer<typeof createCategoryInput>;
+	author: z.infer<typeof createAuthorInput>;
 };
 
-export async function createCategory({
+export async function createAuthor({
 	db,
-	category,
-}: CreateCategoryOptions): Promise<Result<z.infer<typeof CategorySchema>>> {
+	author,
+}: CreateAuthorOptions): Promise<Result<z.infer<typeof AuthorSchema>>> {
 	try {
-		const categoryId = nanoid();
+		const authorId = nanoid();
 		const stmt = db.prepare(
-			'INSERT INTO [Category] (Id, Name, Description) VALUES (?, ?, ?) RETURNING *',
+			'INSERT INTO [Author] (Id, Name) VALUES (?, ?) RETURNING *',
 		);
 
 		const result = await stmt
-			.bind(categoryId, category.name, category.description)
-			.first<z.infer<typeof CategorySchema>>();
+			.bind(authorId, author.name)
+			.first<z.infer<typeof AuthorSchema>>();
 
 		if (!result) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create category');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create author');
 		}
 		return ok(result);
 	} catch (error: unknown) {
@@ -130,34 +129,34 @@ export async function createCategory({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 
 		if (errorMessage.includes('UNIQUE constraint failed')) {
-			return err(ERR.CONFLICT, 'Category ID already exists');
+			return err(ERR.CONFLICT, 'Author ID already exists');
 		}
 
-		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create category');
+		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create author');
 	}
 }
 
 // ==============================
-// GET CATEGORY
+// GET AUTHOR
 // ==============================
 
-export const getCategoryInput = CategorySchema.pick({ id: true });
+export const getAuthorInput = AuthorSchema.pick({ id: true });
 
-export type GetCategoryOptions = {
+export type GetAuthorOptions = {
 	db: D1Database;
 	id: string;
 };
 
-export async function getCategory({
+export async function getAuthor({
 	db,
 	id,
-}: GetCategoryOptions): Promise<Result<z.infer<typeof CategorySchema>>> {
+}: GetAuthorOptions): Promise<Result<z.infer<typeof AuthorSchema>>> {
 	try {
-		const stmt = db.prepare('SELECT * FROM [Category] WHERE Id = ?');
-		const result = await stmt.bind(id).first<z.infer<typeof CategorySchema>>();
+		const stmt = db.prepare('SELECT * FROM [Author] WHERE Id = ?');
+		const result = await stmt.bind(id).first<z.infer<typeof AuthorSchema>>();
 
 		if (!result) {
-			return err(ERR.NOT_FOUND, 'Category not found');
+			return err(ERR.NOT_FOUND, 'Author not found');
 		}
 
 		return ok(result);
@@ -166,22 +165,22 @@ export async function getCategory({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 		return err(
 			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get category: ${errorMessage}`,
+			`Unable to get author: ${errorMessage}`,
 		);
 	}
 }
 
 // ==============================
-// GET ALL CATEGORIES
+// GET ALL AUTHORS
 // ==============================
 
-export const getAllCategoriesInput = z.object({
+export const getAllAuthorsInput = z.object({
 	page: z.number().int().min(1).default(1),
 	limit: z.number().int().min(1).max(100).default(10),
 });
 
-export const getAllCategoriesOutput = z.object({
-	categories: z.array(CategorySchema),
+export const getAllAuthorsOutput = z.object({
+	authors: z.array(AuthorSchema),
 	pagination: z.object({
 		page: z.number(),
 		limit: z.number(),
@@ -192,44 +191,44 @@ export const getAllCategoriesOutput = z.object({
 	}),
 });
 
-export type GetAllCategoriesOptions = {
+export type GetAllAuthorsOptions = {
 	db: D1Database;
 	page: number;
 	limit: number;
 };
 
-export async function getAllCategories({
+export async function getAllAuthors({
 	db,
 	page,
 	limit,
-}: GetAllCategoriesOptions): Promise<
-	Result<z.infer<typeof getAllCategoriesOutput>>
+}: GetAllAuthorsOptions): Promise<
+	Result<z.infer<typeof getAllAuthorsOutput>>
 > {
 	try {
 		const offset = (page - 1) * limit;
 
-		const countQuery = `SELECT COUNT(*) as total FROM [Category]`;
+		const countQuery = `SELECT COUNT(*) as total FROM [Author]`;
 		const countResult = await db.prepare(countQuery).first<{ total: number }>();
 
 		if (!countResult) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count categories');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count authors');
 		}
 
 		const total = countResult.total;
 		const totalPages = Math.ceil(total / limit);
 
-		const query = `SELECT * FROM [Category] ORDER BY Name ASC LIMIT ? OFFSET ?`;
+		const query = `SELECT * FROM [Author] ORDER BY Name ASC LIMIT ? OFFSET ?`;
 		const result = await db
 			.prepare(query)
 			.bind(limit, offset)
-			.all<z.infer<typeof CategorySchema>>();
+			.all<z.infer<typeof AuthorSchema>>();
 
 		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve categories');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve authors');
 		}
 
 		return ok({
-			categories: result.results || [],
+			authors: result.results || [],
 			pagination: {
 				page,
 				limit,
@@ -244,48 +243,47 @@ export async function getAllCategories({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 		return err(
 			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get categories: ${errorMessage}`,
+			`Unable to get authors: ${errorMessage}`,
 		);
 	}
 }
 
 // ==============================
-// UPDATE CATEGORY
+// UPDATE AUTHOR
 // ==============================
 
-export const updateCategoryInput = z.object({
+export const updateAuthorInput = z.object({
 	id: z.string(),
 	name: z.string().nullable(),
-	description: z.string().nullable(),
 });
 
-export type UpdateCategoryOptions = {
+export type UpdateAuthorOptions = {
 	db: D1Database;
 	id: string;
-	category: Omit<z.infer<typeof updateCategoryInput>, 'id'>;
+	author: Omit<z.infer<typeof updateAuthorInput>, 'id'>;
 };
 
-export async function updateCategory({
+export async function updateAuthor({
 	db,
 	id,
-	category,
-}: UpdateCategoryOptions): Promise<Result<z.infer<typeof CategorySchema>>> {
+	author,
+}: UpdateAuthorOptions): Promise<Result<z.infer<typeof AuthorSchema>>> {
 	try {
-		const existingCategory = await getCategory({ db, id });
-		if (existingCategory.err) {
-			return existingCategory;
+		const existingAuthor = await getAuthor({ db, id });
+		if (existingAuthor.err) {
+			return existingAuthor;
 		}
 
 		const stmt = db.prepare(
-			'UPDATE [Category] SET Name = ?, Description = ? WHERE Id = ? RETURNING *',
+			'UPDATE [Author] SET Name = ? WHERE Id = ? RETURNING *',
 		);
 
 		const result = await stmt
-			.bind(category.name, category.description, id)
-			.first<z.infer<typeof CategorySchema>>();
+			.bind(author.name, id)
+			.first<z.infer<typeof AuthorSchema>>();
 
 		if (!result) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update category');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update author');
 		}
 
 		return ok(result);
@@ -293,47 +291,47 @@ export async function updateCategory({
 		const errorMessage =
 			error instanceof Error ? error.message : 'Unknown error occurred';
 
-		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update category');
+		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update author');
 	}
 }
 
 // ==============================
-// DELETE CATEGORY
+// DELETE AUTHOR
 // ==============================
 
-export const deleteCategoryInput = CategorySchema.pick({ id: true });
+export const deleteAuthorInput = AuthorSchema.pick({ id: true });
 
-export const deleteCategoryOutput = z.object({
+export const deleteAuthorOutput = z.object({
 	id: z.string(),
 	changes: z.number(),
 });
 
-export type DeleteCategoryOptions = {
+export type DeleteAuthorOptions = {
 	db: D1Database;
 	id: string;
 };
 
-export async function deleteCategory({
+export async function deleteAuthor({
 	db,
 	id,
-}: DeleteCategoryOptions): Promise<
-	Result<z.infer<typeof deleteCategoryOutput>>
+}: DeleteAuthorOptions): Promise<
+	Result<z.infer<typeof deleteAuthorOutput>>
 > {
 	try {
-		const existingCategory = await getCategory({ db, id });
-		if (existingCategory.err) {
-			return existingCategory;
+		const existingAuthor = await getAuthor({ db, id });
+		if (existingAuthor.err) {
+			return existingAuthor;
 		}
 
-		const stmt = db.prepare('DELETE FROM [Category] WHERE Id = ?');
+		const stmt = db.prepare('DELETE FROM [Author] WHERE Id = ?');
 		const result = await stmt.bind(id).run();
 
 		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to delete category');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to delete author');
 		}
 
 		if (result.meta.changes === 0) {
-			return err(ERR.NOT_FOUND, 'Category not found');
+			return err(ERR.NOT_FOUND, 'Author not found');
 		}
 
 		return ok({ id, changes: result.meta.changes });
@@ -342,13 +340,13 @@ export async function deleteCategory({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 		return err(
 			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to delete category: ${errorMessage}`,
+			`Unable to delete author: ${errorMessage}`,
 		);
 	}
 }
 ```
 
-`gas/db/src/customer.ts`:
+`gas/db/src/book.ts`:
 ```ts
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
@@ -359,55 +357,41 @@ import type { Result } from 'core';
 // SCHEMA
 // ==============================
 
-export const CustomerSchema = z.object({
+export const BookSchema = z.object({
 	id: z.string(),
-	firstName: z.string().nullable(),
-	lastName: z.string().nullable(),
-	address: z.string().nullable(),
-	city: z.string().nullable(),
-	state: z.string().nullable(),
-	postalCode: z.string().nullable(),
-	country: z.string().nullable(),
+	authorId: z.string(),
+	title: z.string().nullable(),
 });
 
 // ==============================
-// CREATE CUSTOMER
+// CREATE BOOK
 // ==============================
 
-export const createCustomerInput = CustomerSchema.omit({
+export const createBookInput = BookSchema.omit({
 	id: true,
 });
 
-export type CreateCustomerOptions = {
+export type CreateBookOptions = {
 	db: D1Database;
-	customer: z.infer<typeof createCustomerInput>;
+	book: z.infer<typeof createBookInput>;
 };
 
-export async function createCustomer({
+export async function createBook({
 	db,
-	customer,
-}: CreateCustomerOptions): Promise<Result<z.infer<typeof CustomerSchema>>> {
+	book,
+}: CreateBookOptions): Promise<Result<z.infer<typeof BookSchema>>> {
 	try {
-		const customerId = nanoid();
+		const bookId = nanoid();
 		const stmt = db.prepare(
-			'INSERT INTO [Customer] (Id, FirstName, LastName, Address, City, State, PostalCode, Country) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *',
+			'INSERT INTO [Book] (Id, AuthorId, Title) VALUES (?, ?, ?) RETURNING *',
 		);
 
 		const result = await stmt
-			.bind(
-				customerId,
-				customer.firstName,
-				customer.lastName,
-				customer.address,
-				customer.city,
-				customer.state,
-				customer.postalCode,
-				customer.country,
-			)
-			.first<z.infer<typeof CustomerSchema>>();
+			.bind(bookId, book.authorId, book.title)
+			.first<z.infer<typeof BookSchema>>();
 
 		if (!result) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create customer');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create book');
 		}
 		return ok(result);
 	} catch (error: unknown) {
@@ -415,421 +399,38 @@ export async function createCustomer({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 
 		if (errorMessage.includes('UNIQUE constraint failed')) {
-			return err(ERR.CONFLICT, 'Customer ID already exists');
-		}
-
-		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create customer');
-	}
-}
-
-// ==============================
-// GET CUSTOMER
-// ==============================
-
-export const getCustomerInput = CustomerSchema.pick({ id: true });
-
-export type GetCustomerOptions = {
-	db: D1Database;
-	id: string;
-};
-
-export async function getCustomer({
-	db,
-	id,
-}: GetCustomerOptions): Promise<Result<z.infer<typeof CustomerSchema>>> {
-	try {
-		const stmt = db.prepare('SELECT * FROM [Customer] WHERE Id = ?');
-		const result = await stmt.bind(id).first<z.infer<typeof CustomerSchema>>();
-
-		if (!result) {
-			return err(ERR.NOT_FOUND, 'Customer not found');
-		}
-
-		return ok(result);
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-		return err(
-			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get customer: ${errorMessage}`,
-		);
-	}
-}
-
-// ==============================
-// GET ALL CUSTOMERS
-// ==============================
-
-export const getAllCustomersInput = z.object({
-	page: z.number().int().min(1).default(1),
-	limit: z.number().int().min(1).max(100).default(10),
-});
-
-export const getAllCustomersOutput = z.object({
-	customers: z.array(CustomerSchema),
-	pagination: z.object({
-		page: z.number(),
-		limit: z.number(),
-		total: z.number(),
-		totalPages: z.number(),
-		hasNext: z.boolean(),
-		hasPrev: z.boolean(),
-	}),
-});
-
-export type GetAllCustomersOptions = {
-	db: D1Database;
-	page: number;
-	limit: number;
-};
-
-export async function getAllCustomers({
-	db,
-	page,
-	limit,
-}: GetAllCustomersOptions): Promise<
-	Result<z.infer<typeof getAllCustomersOutput>>
-> {
-	try {
-		const offset = (page - 1) * limit;
-
-		const countQuery = `SELECT COUNT(*) as total FROM [Customer]`;
-		const countResult = await db.prepare(countQuery).first<{ total: number }>();
-
-		if (!countResult) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count customers');
-		}
-
-		const total = countResult.total;
-		const totalPages = Math.ceil(total / limit);
-
-		const query = `SELECT * FROM [Customer] ORDER BY LastName ASC LIMIT ? OFFSET ?`;
-		const result = await db
-			.prepare(query)
-			.bind(limit, offset)
-			.all<z.infer<typeof CustomerSchema>>();
-
-		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve customers');
-		}
-
-		return ok({
-			customers: result.results || [],
-			pagination: {
-				page,
-				limit,
-				total,
-				totalPages,
-				hasNext: page < totalPages,
-				hasPrev: page > 1,
-			},
-		});
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-		return err(
-			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get customers: ${errorMessage}`,
-		);
-	}
-}
-
-// ==============================
-// SEARCH CUSTOMERS
-// ==============================
-
-export const searchCustomersInput = z.object({
-	query: z.string().min(1),
-	page: z.number().int().min(1).default(1),
-	limit: z.number().int().min(1).max(100).default(10),
-});
-
-export type SearchCustomersOptions = {
-	db: D1Database;
-	query: string;
-	page: number;
-	limit: number;
-};
-
-export async function searchCustomers({
-	db,
-	query,
-	page,
-	limit,
-}: SearchCustomersOptions): Promise<
-	Result<z.infer<typeof getAllCustomersOutput>>
-> {
-	try {
-		const offset = (page - 1) * limit;
-		const searchPattern = `%${query}%`;
-
-		const countQuery = `
-			SELECT COUNT(*) as total FROM [Customer]
-			WHERE FirstName LIKE ? OR LastName LIKE ? OR City LIKE ? OR Country LIKE ?
-		`;
-		const countResult = await db
-			.prepare(countQuery)
-			.bind(searchPattern, searchPattern, searchPattern, searchPattern)
-			.first<{ total: number }>();
-
-		if (!countResult) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count customers');
-		}
-
-		const total = countResult.total;
-		const totalPages = Math.ceil(total / limit);
-
-		const searchQuery = `
-			SELECT * FROM [Customer]
-			WHERE FirstName LIKE ? OR LastName LIKE ? OR City LIKE ? OR Country LIKE ?
-			ORDER BY LastName ASC
-			LIMIT ? OFFSET ?
-		`;
-		const result = await db
-			.prepare(searchQuery)
-			.bind(
-				searchPattern,
-				searchPattern,
-				searchPattern,
-				searchPattern,
-				limit,
-				offset,
-			)
-			.all<z.infer<typeof CustomerSchema>>();
-
-		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to search customers');
-		}
-
-		return ok({
-			customers: result.results || [],
-			pagination: {
-				page,
-				limit,
-				total,
-				totalPages,
-				hasNext: page < totalPages,
-				hasPrev: page > 1,
-			},
-		});
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-		return err(
-			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to search customers: ${errorMessage}`,
-		);
-	}
-}
-
-// ==============================
-// UPDATE CUSTOMER
-// ==============================
-
-export const updateCustomerInput = z.object({
-	id: z.string(),
-	firstName: z.string().nullable(),
-	lastName: z.string().nullable(),
-	address: z.string().nullable(),
-	city: z.string().nullable(),
-	state: z.string().nullable(),
-	postalCode: z.string().nullable(),
-	country: z.string().nullable(),
-});
-
-export type UpdateCustomerOptions = {
-	db: D1Database;
-	id: string;
-	customer: Omit<z.infer<typeof updateCustomerInput>, 'id'>;
-};
-
-export async function updateCustomer({
-	db,
-	id,
-	customer,
-}: UpdateCustomerOptions): Promise<Result<z.infer<typeof CustomerSchema>>> {
-	try {
-		const existingCustomer = await getCustomer({ db, id });
-		if (existingCustomer.err) {
-			return existingCustomer;
-		}
-
-		const stmt = db.prepare(`
-			UPDATE [Customer] SET
-				FirstName = ?,
-				LastName = ?,
-				Address = ?,
-				City = ?,
-				State = ?,
-				PostalCode = ?,
-				Country = ?
-			WHERE Id = ?
-			RETURNING *
-		`);
-
-		const result = await stmt
-			.bind(
-				customer.firstName,
-				customer.lastName,
-				customer.address,
-				customer.city,
-				customer.state,
-				customer.postalCode,
-				customer.country,
-				id,
-			)
-			.first<z.infer<typeof CustomerSchema>>();
-
-		if (!result) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update customer');
-		}
-
-		return ok(result);
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-
-		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update customer');
-	}
-}
-
-// ==============================
-// DELETE CUSTOMER
-// ==============================
-
-export const deleteCustomerInput = CustomerSchema.pick({ id: true });
-
-export const deleteCustomerOutput = z.object({
-	id: z.string(),
-	changes: z.number(),
-});
-
-export type DeleteCustomerOptions = {
-	db: D1Database;
-	id: string;
-};
-
-export async function deleteCustomer({
-	db,
-	id,
-}: DeleteCustomerOptions): Promise<
-	Result<z.infer<typeof deleteCustomerOutput>>
-> {
-	try {
-		const existingCustomer = await getCustomer({ db, id });
-		if (existingCustomer.err) {
-			return existingCustomer;
-		}
-
-		const stmt = db.prepare('DELETE FROM [Customer] WHERE Id = ?');
-		const result = await stmt.bind(id).run();
-
-		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to delete customer');
-		}
-
-		if (result.meta.changes === 0) {
-			return err(ERR.NOT_FOUND, 'Customer not found');
-		}
-
-		return ok({ id, changes: result.meta.changes });
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-		return err(
-			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to delete customer: ${errorMessage}`,
-		);
-	}
-}
-```
-
-`gas/db/src/product.ts`:
-```ts
-import { nanoid } from 'nanoid';
-import { z } from 'zod';
-import { ERR, ok, err } from 'core';
-import type { Result } from 'core';
-
-// ==============================
-// SCHEMA
-// ==============================
-
-export const ProductSchema = z.object({
-	id: z.string(),
-	name: z.string().nullable(),
-	categoryId: z.string(),
-	price: z.number(),
-});
-
-// ==============================
-// CREATE PRODUCT
-// ==============================
-
-export const createProductInput = ProductSchema.omit({
-	id: true,
-});
-
-export type CreateProductOptions = {
-	db: D1Database;
-	product: z.infer<typeof createProductInput>;
-};
-
-export async function createProduct({
-	db,
-	product,
-}: CreateProductOptions): Promise<Result<z.infer<typeof ProductSchema>>> {
-	try {
-		const productId = nanoid();
-		const stmt = db.prepare(
-			'INSERT INTO [Product] (Id, Name, CategoryId, Price) VALUES (?, ?, ?, ?) RETURNING *',
-		);
-
-		const result = await stmt
-			.bind(productId, product.name, product.categoryId, product.price)
-			.first<z.infer<typeof ProductSchema>>();
-
-		if (!result) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create product');
-		}
-		return ok(result);
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-
-		if (errorMessage.includes('UNIQUE constraint failed')) {
-			return err(ERR.CONFLICT, 'Product ID already exists');
+			return err(ERR.CONFLICT, 'Book ID already exists');
 		}
 
 		if (errorMessage.includes('FOREIGN KEY constraint failed')) {
-			return err(ERR.BAD_REQUEST, 'Invalid category ID');
+			return err(ERR.BAD_REQUEST, 'Invalid author ID');
 		}
 
-		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create product');
+		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create book');
 	}
 }
 
 // ==============================
-// GET PRODUCT
+// GET BOOK
 // ==============================
 
-export const getProductInput = ProductSchema.pick({ id: true });
+export const getBookInput = BookSchema.pick({ id: true });
 
-export type GetProductOptions = {
+export type GetBookOptions = {
 	db: D1Database;
 	id: string;
 };
 
-export async function getProduct({
+export async function getBook({
 	db,
 	id,
-}: GetProductOptions): Promise<Result<z.infer<typeof ProductSchema>>> {
+}: GetBookOptions): Promise<Result<z.infer<typeof BookSchema>>> {
 	try {
-		const stmt = db.prepare('SELECT * FROM [Product] WHERE Id = ?');
-		const result = await stmt.bind(id).first<z.infer<typeof ProductSchema>>();
+		const stmt = db.prepare('SELECT * FROM [Book] WHERE Id = ?');
+		const result = await stmt.bind(id).first<z.infer<typeof BookSchema>>();
 
 		if (!result) {
-			return err(ERR.NOT_FOUND, 'Product not found');
+			return err(ERR.NOT_FOUND, 'Book not found');
 		}
 
 		return ok(result);
@@ -838,22 +439,22 @@ export async function getProduct({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 		return err(
 			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get product: ${errorMessage}`,
+			`Unable to get book: ${errorMessage}`,
 		);
 	}
 }
 
 // ==============================
-// GET ALL PRODUCTS
+// GET ALL BOOKS
 // ==============================
 
-export const getAllProductsInput = z.object({
+export const getAllBooksInput = z.object({
 	page: z.number().int().min(1).default(1),
 	limit: z.number().int().min(1).max(100).default(10),
 });
 
-export const getAllProductsOutput = z.object({
-	products: z.array(ProductSchema),
+export const getAllBooksOutput = z.object({
+	books: z.array(BookSchema),
 	pagination: z.object({
 		page: z.number(),
 		limit: z.number(),
@@ -864,44 +465,42 @@ export const getAllProductsOutput = z.object({
 	}),
 });
 
-export type GetAllProductsOptions = {
+export type GetAllBooksOptions = {
 	db: D1Database;
 	page: number;
 	limit: number;
 };
 
-export async function getAllProducts({
+export async function getAllBooks({
 	db,
 	page,
 	limit,
-}: GetAllProductsOptions): Promise<
-	Result<z.infer<typeof getAllProductsOutput>>
-> {
+}: GetAllBooksOptions): Promise<Result<z.infer<typeof getAllBooksOutput>>> {
 	try {
 		const offset = (page - 1) * limit;
 
-		const countQuery = `SELECT COUNT(*) as total FROM [Product]`;
+		const countQuery = `SELECT COUNT(*) as total FROM [Book]`;
 		const countResult = await db.prepare(countQuery).first<{ total: number }>();
 
 		if (!countResult) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count products');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count books');
 		}
 
 		const total = countResult.total;
 		const totalPages = Math.ceil(total / limit);
 
-		const query = `SELECT * FROM [Product] ORDER BY Name ASC LIMIT ? OFFSET ?`;
+		const query = `SELECT * FROM [Book] ORDER BY Title ASC LIMIT ? OFFSET ?`;
 		const result = await db
 			.prepare(query)
 			.bind(limit, offset)
-			.all<z.infer<typeof ProductSchema>>();
+			.all<z.infer<typeof BookSchema>>();
 
 		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve products');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve books');
 		}
 
 		return ok({
-			products: result.results || [],
+			books: result.results || [],
 			pagination: {
 				page,
 				limit,
@@ -916,64 +515,64 @@ export async function getAllProducts({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 		return err(
 			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get products: ${errorMessage}`,
+			`Unable to get books: ${errorMessage}`,
 		);
 	}
 }
 
 // ==============================
-// GET PRODUCTS BY CATEGORY
+// GET BOOKS BY AUTHOR
 // ==============================
 
-export const getProductsByCategoryInput = z.object({
-	categoryId: z.string(),
+export const getBooksByAuthorInput = z.object({
+	authorId: z.string(),
 	page: z.number().int().min(1).default(1),
 	limit: z.number().int().min(1).max(100).default(10),
 });
 
-export type GetProductsByCategoryOptions = {
+export type GetBooksByAuthorOptions = {
 	db: D1Database;
-	categoryId: string;
+	authorId: string;
 	page: number;
 	limit: number;
 };
 
-export async function getProductsByCategory({
+export async function getBooksByAuthor({
 	db,
-	categoryId,
+	authorId,
 	page,
 	limit,
-}: GetProductsByCategoryOptions): Promise<
-	Result<z.infer<typeof getAllProductsOutput>>
+}: GetBooksByAuthorOptions): Promise<
+	Result<z.infer<typeof getAllBooksOutput>>
 > {
 	try {
 		const offset = (page - 1) * limit;
 
-		const countQuery = `SELECT COUNT(*) as total FROM [Product] WHERE CategoryId = ?`;
+		const countQuery = `SELECT COUNT(*) as total FROM [Book] WHERE AuthorId = ?`;
 		const countResult = await db
 			.prepare(countQuery)
-			.bind(categoryId)
+			.bind(authorId)
 			.first<{ total: number }>();
 
 		if (!countResult) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count products');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count books');
 		}
 
 		const total = countResult.total;
 		const totalPages = Math.ceil(total / limit);
 
-		const query = `SELECT * FROM [Product] WHERE CategoryId = ? ORDER BY Name ASC LIMIT ? OFFSET ?`;
+		const query = `SELECT * FROM [Book] WHERE AuthorId = ? ORDER BY Title ASC LIMIT ? OFFSET ?`;
 		const result = await db
 			.prepare(query)
-			.bind(categoryId, limit, offset)
-			.all<z.infer<typeof ProductSchema>>();
+			.bind(authorId, limit, offset)
+			.all<z.infer<typeof BookSchema>>();
 
 		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve products');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve books');
 		}
 
 		return ok({
-			products: result.results || [],
+			books: result.results || [],
 			pagination: {
 				page,
 				limit,
@@ -988,43 +587,41 @@ export async function getProductsByCategory({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 		return err(
 			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get products by category: ${errorMessage}`,
+			`Unable to get books by author: ${errorMessage}`,
 		);
 	}
 }
 
 // ==============================
-// SEARCH PRODUCTS
+// SEARCH BOOKS
 // ==============================
 
-export const searchProductsInput = z.object({
+export const searchBooksInput = z.object({
 	query: z.string().min(1),
 	page: z.number().int().min(1).default(1),
 	limit: z.number().int().min(1).max(100).default(10),
 });
 
-export type SearchProductsOptions = {
+export type SearchBooksOptions = {
 	db: D1Database;
 	query: string;
 	page: number;
 	limit: number;
 };
 
-export async function searchProducts({
+export async function searchBooks({
 	db,
 	query,
 	page,
 	limit,
-}: SearchProductsOptions): Promise<
-	Result<z.infer<typeof getAllProductsOutput>>
-> {
+}: SearchBooksOptions): Promise<Result<z.infer<typeof getAllBooksOutput>>> {
 	try {
 		const offset = (page - 1) * limit;
 		const searchPattern = `%${query}%`;
 
 		const countQuery = `
-			SELECT COUNT(*) as total FROM [Product]
-			WHERE Name LIKE ?
+			SELECT COUNT(*) as total FROM [Book]
+			WHERE Title LIKE ?
 		`;
 		const countResult = await db
 			.prepare(countQuery)
@@ -1032,29 +629,29 @@ export async function searchProducts({
 			.first<{ total: number }>();
 
 		if (!countResult) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count products');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count books');
 		}
 
 		const total = countResult.total;
 		const totalPages = Math.ceil(total / limit);
 
 		const searchQuery = `
-			SELECT * FROM [Product]
-			WHERE Name LIKE ?
-			ORDER BY Name ASC
+			SELECT * FROM [Book]
+			WHERE Title LIKE ?
+			ORDER BY Title ASC
 			LIMIT ? OFFSET ?
 		`;
 		const result = await db
 			.prepare(searchQuery)
 			.bind(searchPattern, limit, offset)
-			.all<z.infer<typeof ProductSchema>>();
+			.all<z.infer<typeof BookSchema>>();
 
 		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to search products');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to search books');
 		}
 
 		return ok({
-			products: result.results || [],
+			books: result.results || [],
 			pagination: {
 				page,
 				limit,
@@ -1069,49 +666,48 @@ export async function searchProducts({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 		return err(
 			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to search products: ${errorMessage}`,
+			`Unable to search books: ${errorMessage}`,
 		);
 	}
 }
 
 // ==============================
-// UPDATE PRODUCT
+// UPDATE BOOK
 // ==============================
 
-export const updateProductInput = z.object({
+export const updateBookInput = z.object({
 	id: z.string(),
-	name: z.string().nullable(),
-	categoryId: z.string(),
-	price: z.number(),
+	authorId: z.string(),
+	title: z.string().nullable(),
 });
 
-export type UpdateProductOptions = {
+export type UpdateBookOptions = {
 	db: D1Database;
 	id: string;
-	product: Omit<z.infer<typeof updateProductInput>, 'id'>;
+	book: Omit<z.infer<typeof updateBookInput>, 'id'>;
 };
 
-export async function updateProduct({
+export async function updateBook({
 	db,
 	id,
-	product,
-}: UpdateProductOptions): Promise<Result<z.infer<typeof ProductSchema>>> {
+	book,
+}: UpdateBookOptions): Promise<Result<z.infer<typeof BookSchema>>> {
 	try {
-		const existingProduct = await getProduct({ db, id });
-		if (existingProduct.err) {
-			return existingProduct;
+		const existingBook = await getBook({ db, id });
+		if (existingBook.err) {
+			return existingBook;
 		}
 
 		const stmt = db.prepare(
-			'UPDATE [Product] SET Name = ?, CategoryId = ?, Price = ? WHERE Id = ? RETURNING *',
+			'UPDATE [Book] SET AuthorId = ?, Title = ? WHERE Id = ? RETURNING *',
 		);
 
 		const result = await stmt
-			.bind(product.name, product.categoryId, product.price, id)
-			.first<z.infer<typeof ProductSchema>>();
+			.bind(book.authorId, book.title, id)
+			.first<z.infer<typeof BookSchema>>();
 
 		if (!result) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update product');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update book');
 		}
 
 		return ok(result);
@@ -1120,48 +716,48 @@ export async function updateProduct({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 
 		if (errorMessage.includes('FOREIGN KEY constraint failed')) {
-			return err(ERR.BAD_REQUEST, 'Invalid category ID');
+			return err(ERR.BAD_REQUEST, 'Invalid author ID');
 		}
 
-		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update product');
+		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update book');
 	}
 }
 
 // ==============================
-// DELETE PRODUCT
+// DELETE BOOK
 // ==============================
 
-export const deleteProductInput = ProductSchema.pick({ id: true });
+export const deleteBookInput = BookSchema.pick({ id: true });
 
-export const deleteProductOutput = z.object({
+export const deleteBookOutput = z.object({
 	id: z.string(),
 	changes: z.number(),
 });
 
-export type DeleteProductOptions = {
+export type DeleteBookOptions = {
 	db: D1Database;
 	id: string;
 };
 
-export async function deleteProduct({
+export async function deleteBook({
 	db,
 	id,
-}: DeleteProductOptions): Promise<Result<z.infer<typeof deleteProductOutput>>> {
+}: DeleteBookOptions): Promise<Result<z.infer<typeof deleteBookOutput>>> {
 	try {
-		const existingProduct = await getProduct({ db, id });
-		if (existingProduct.err) {
-			return existingProduct;
+		const existingBook = await getBook({ db, id });
+		if (existingBook.err) {
+			return existingBook;
 		}
 
-		const stmt = db.prepare('DELETE FROM [Product] WHERE Id = ?');
+		const stmt = db.prepare('DELETE FROM [Book] WHERE Id = ?');
 		const result = await stmt.bind(id).run();
 
 		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to delete product');
+			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to delete book');
 		}
 
 		if (result.meta.changes === 0) {
-			return err(ERR.NOT_FOUND, 'Product not found');
+			return err(ERR.NOT_FOUND, 'Book not found');
 		}
 
 		return ok({ id, changes: result.meta.changes });
@@ -1170,361 +766,7 @@ export async function deleteProduct({
 			error instanceof Error ? error.message : 'Unknown error occurred';
 		return err(
 			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to delete product: ${errorMessage}`,
-		);
-	}
-}
-```
-
-`gas/db/src/order.ts`:
-```ts
-import { nanoid } from 'nanoid';
-import { z } from 'zod';
-import { ERR, ok, err } from 'core';
-import type { Result } from 'core';
-
-// ==============================
-// SCHEMA
-// ==============================
-
-export const OrderSchema = z.object({
-	id: z.string(),
-	customerId: z.string().nullable(),
-	date: z.number(),
-	cost: z.number(),
-});
-
-// ==============================
-// CREATE ORDER
-// ==============================
-
-export const createOrderInput = OrderSchema.omit({
-	id: true,
-});
-
-export type CreateOrderOptions = {
-	db: D1Database;
-	order: z.infer<typeof createOrderInput>;
-};
-
-export async function createOrder({
-	db,
-	order,
-}: CreateOrderOptions): Promise<Result<z.infer<typeof OrderSchema>>> {
-	try {
-		const orderId = nanoid();
-		const stmt = db.prepare(
-			'INSERT INTO [Order] (Id, CustomerId, Date, Cost) VALUES (?, ?, ?, ?) RETURNING *',
-		);
-
-		const result = await stmt
-			.bind(orderId, order.customerId, order.date, order.cost)
-			.first<z.infer<typeof OrderSchema>>();
-
-		if (!result) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create order');
-		}
-		return ok(result);
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-
-		if (errorMessage.includes('UNIQUE constraint failed')) {
-			return err(ERR.CONFLICT, 'Order ID already exists');
-		}
-
-		if (errorMessage.includes('FOREIGN KEY constraint failed')) {
-			return err(ERR.BAD_REQUEST, 'Invalid customer ID');
-		}
-
-		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to create order');
-	}
-}
-
-// ==============================
-// GET ORDER
-// ==============================
-
-export const getOrderInput = OrderSchema.pick({ id: true });
-
-export type GetOrderOptions = {
-	db: D1Database;
-	id: string;
-};
-
-export async function getOrder({
-	db,
-	id,
-}: GetOrderOptions): Promise<Result<z.infer<typeof OrderSchema>>> {
-	try {
-		const stmt = db.prepare('SELECT * FROM [Order] WHERE Id = ?');
-		const result = await stmt.bind(id).first<z.infer<typeof OrderSchema>>();
-
-		if (!result) {
-			return err(ERR.NOT_FOUND, 'Order not found');
-		}
-
-		return ok(result);
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-		return err(
-			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get order: ${errorMessage}`,
-		);
-	}
-}
-
-// ==============================
-// GET ALL ORDERS
-// ==============================
-
-export const getAllOrdersInput = z.object({
-	page: z.number().int().min(1).default(1),
-	limit: z.number().int().min(1).max(100).default(10),
-});
-
-export const getAllOrdersOutput = z.object({
-	orders: z.array(OrderSchema),
-	pagination: z.object({
-		page: z.number(),
-		limit: z.number(),
-		total: z.number(),
-		totalPages: z.number(),
-		hasNext: z.boolean(),
-		hasPrev: z.boolean(),
-	}),
-});
-
-export type GetAllOrdersOptions = {
-	db: D1Database;
-	page: number;
-	limit: number;
-};
-
-export async function getAllOrders({
-	db,
-	page,
-	limit,
-}: GetAllOrdersOptions): Promise<Result<z.infer<typeof getAllOrdersOutput>>> {
-	try {
-		const offset = (page - 1) * limit;
-
-		const countQuery = `SELECT COUNT(*) as total FROM [Order]`;
-		const countResult = await db.prepare(countQuery).first<{ total: number }>();
-
-		if (!countResult) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count orders');
-		}
-
-		const total = countResult.total;
-		const totalPages = Math.ceil(total / limit);
-
-		const query = `SELECT * FROM [Order] ORDER BY Date DESC LIMIT ? OFFSET ?`;
-		const result = await db
-			.prepare(query)
-			.bind(limit, offset)
-			.all<z.infer<typeof OrderSchema>>();
-
-		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve orders');
-		}
-
-		return ok({
-			orders: result.results || [],
-			pagination: {
-				page,
-				limit,
-				total,
-				totalPages,
-				hasNext: page < totalPages,
-				hasPrev: page > 1,
-			},
-		});
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-		return err(
-			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get orders: ${errorMessage}`,
-		);
-	}
-}
-
-// ==============================
-// GET ORDERS BY CUSTOMER
-// ==============================
-
-export const getOrdersByCustomerInput = z.object({
-	customerId: z.string(),
-	page: z.number().int().min(1).default(1),
-	limit: z.number().int().min(1).max(100).default(10),
-});
-
-export type GetOrdersByCustomerOptions = {
-	db: D1Database;
-	customerId: string;
-	page: number;
-	limit: number;
-};
-
-export async function getOrdersByCustomer({
-	db,
-	customerId,
-	page,
-	limit,
-}: GetOrdersByCustomerOptions): Promise<
-	Result<z.infer<typeof getAllOrdersOutput>>
-> {
-	try {
-		const offset = (page - 1) * limit;
-
-		const countQuery = `SELECT COUNT(*) as total FROM [Order] WHERE CustomerId = ?`;
-		const countResult = await db
-			.prepare(countQuery)
-			.bind(customerId)
-			.first<{ total: number }>();
-
-		if (!countResult) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to count orders');
-		}
-
-		const total = countResult.total;
-		const totalPages = Math.ceil(total / limit);
-
-		const query = `SELECT * FROM [Order] WHERE CustomerId = ? ORDER BY Date DESC LIMIT ? OFFSET ?`;
-		const result = await db
-			.prepare(query)
-			.bind(customerId, limit, offset)
-			.all<z.infer<typeof OrderSchema>>();
-
-		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Failed to retrieve orders');
-		}
-
-		return ok({
-			orders: result.results || [],
-			pagination: {
-				page,
-				limit,
-				total,
-				totalPages,
-				hasNext: page < totalPages,
-				hasPrev: page > 1,
-			},
-		});
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-		return err(
-			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to get orders by customer: ${errorMessage}`,
-		);
-	}
-}
-
-// ==============================
-// UPDATE ORDER
-// ==============================
-
-export const updateOrderInput = z.object({
-	id: z.string(),
-	customerId: z.string().nullable(),
-	date: z.number(),
-	cost: z.number(),
-});
-
-export type UpdateOrderOptions = {
-	db: D1Database;
-	id: string;
-	order: Omit<z.infer<typeof updateOrderInput>, 'id'>;
-};
-
-export async function updateOrder({
-	db,
-	id,
-	order,
-}: UpdateOrderOptions): Promise<Result<z.infer<typeof OrderSchema>>> {
-	try {
-		const existingOrder = await getOrder({ db, id });
-		if (existingOrder.err) {
-			return existingOrder;
-		}
-
-		const stmt = db.prepare(`
-			UPDATE [Order] SET
-				CustomerId = ?,
-				Date = ?,
-				Cost = ?
-			WHERE Id = ?
-			RETURNING *
-		`);
-
-		const result = await stmt
-			.bind(order.customerId, order.date, order.cost, id)
-			.first<z.infer<typeof OrderSchema>>();
-
-		if (!result) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update order');
-		}
-
-		return ok(result);
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-
-		if (errorMessage.includes('FOREIGN KEY constraint failed')) {
-			return err(ERR.BAD_REQUEST, 'Invalid customer ID');
-		}
-
-		return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to update order');
-	}
-}
-
-// ==============================
-// DELETE ORDER
-// ==============================
-
-export const deleteOrderInput = OrderSchema.pick({ id: true });
-
-export const deleteOrderOutput = z.object({
-	id: z.string(),
-	changes: z.number(),
-});
-
-export type DeleteOrderOptions = {
-	db: D1Database;
-	id: string;
-};
-
-export async function deleteOrder({
-	db,
-	id,
-}: DeleteOrderOptions): Promise<Result<z.infer<typeof deleteOrderOutput>>> {
-	try {
-		const existingOrder = await getOrder({ db, id });
-		if (existingOrder.err) {
-			return existingOrder;
-		}
-
-		const stmt = db.prepare('DELETE FROM [Order] WHERE Id = ?');
-		const result = await stmt.bind(id).run();
-
-		if (!result.success) {
-			return err(ERR.INTERNAL_SERVER_ERROR, 'Unable to delete order');
-		}
-
-		if (result.meta.changes === 0) {
-			return err(ERR.NOT_FOUND, 'Order not found');
-		}
-
-		return ok({ id, changes: result.meta.changes });
-	} catch (error: unknown) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Unknown error occurred';
-		return err(
-			ERR.INTERNAL_SERVER_ERROR,
-			`Unable to delete order: ${errorMessage}`,
+			`Unable to delete book: ${errorMessage}`,
 		);
 	}
 }

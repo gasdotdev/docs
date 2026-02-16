@@ -17,73 +17,39 @@ oRPC llms.txt: https://orpc.dev/llms.txt
 import { os } from '@orpc/server';
 import { RPCHandler } from '@orpc/server/fetch';
 import {
-	createCategory,
-	createCategoryInput,
-	getCategory,
-	getCategoryInput,
-	getAllCategories,
-	getAllCategoriesInput,
-	getAllCategoriesOutput,
-	updateCategory,
-	updateCategoryInput,
-	deleteCategory,
-	deleteCategoryInput,
-	deleteCategoryOutput,
-	CategorySchema,
-} from '../../db/src/category.ts';
+	createAuthor,
+	createAuthorInput,
+	getAuthor,
+	getAuthorInput,
+	getAllAuthors,
+	getAllAuthorsInput,
+	getAllAuthorsOutput,
+	updateAuthor,
+	updateAuthorInput,
+	deleteAuthor,
+	deleteAuthorInput,
+	deleteAuthorOutput,
+	AuthorSchema,
+} from '../../db/src/author.ts';
 import {
-	createCustomer,
-	createCustomerInput,
-	getCustomer,
-	getCustomerInput,
-	getAllCustomers,
-	getAllCustomersInput,
-	getAllCustomersOutput,
-	searchCustomers,
-	searchCustomersInput,
-	updateCustomer,
-	updateCustomerInput,
-	deleteCustomer,
-	deleteCustomerInput,
-	deleteCustomerOutput,
-	CustomerSchema,
-} from '../../db/src/customer.ts';
-import {
-	createProduct,
-	createProductInput,
-	getProduct,
-	getProductInput,
-	getAllProducts,
-	getAllProductsInput,
-	getAllProductsOutput,
-	getProductsByCategory,
-	getProductsByCategoryInput,
-	searchProducts,
-	searchProductsInput,
-	updateProduct,
-	updateProductInput,
-	deleteProduct,
-	deleteProductInput,
-	deleteProductOutput,
-	ProductSchema,
-} from '../../db/src/product.ts';
-import {
-	createOrder,
-	createOrderInput,
-	getOrder,
-	getOrderInput,
-	getAllOrders,
-	getAllOrdersInput,
-	getAllOrdersOutput,
-	getOrdersByCustomer,
-	getOrdersByCustomerInput,
-	updateOrder,
-	updateOrderInput,
-	deleteOrder,
-	deleteOrderInput,
-	deleteOrderOutput,
-	OrderSchema,
-} from '../../db/src/order.ts';
+	createBook,
+	createBookInput,
+	getBook,
+	getBookInput,
+	getAllBooks,
+	getAllBooksInput,
+	getAllBooksOutput,
+	getBooksByAuthor,
+	getBooksByAuthorInput,
+	searchBooks,
+	searchBooksInput,
+	updateBook,
+	updateBookInput,
+	deleteBook,
+	deleteBookInput,
+	deleteBookOutput,
+	BookSchema,
+} from '../../db/src/book.ts';
 import { res, ERRS } from 'core';
 
 const base = os.$context<{ env: Cloudflare.Env }>().errors(ERRS);
@@ -95,30 +61,30 @@ const rateLimit = base.middleware(async ({ next, errors }) => {
 const api = base.use(rateLimit);
 
 // ==============================
-// CATEGORY ROUTES
+// AUTHOR ROUTES
 // ==============================
 
-const createCategoryRoute = api
+const createAuthorRoute = api
 	.route({ method: 'POST' })
-	.input(createCategoryInput)
-	.output(CategorySchema)
+	.input(createAuthorInput)
+	.output(AuthorSchema)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await createCategory({
+			await createAuthor({
 				db: context.env['root-db'],
-				category: { ...input },
+				author: { ...input },
 			}),
 			errors,
 		);
 	});
 
-const getCategoryRoute = api
+const getAuthorRoute = api
 	.route({ method: 'GET' })
-	.input(getCategoryInput)
-	.output(CategorySchema)
+	.input(getAuthorInput)
+	.output(AuthorSchema)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await getCategory({
+			await getAuthor({
 				db: context.env['root-db'],
 				...input,
 			}),
@@ -126,13 +92,13 @@ const getCategoryRoute = api
 		);
 	});
 
-const getAllCategoriesRoute = api
+const getAllAuthorsRoute = api
 	.route({ method: 'GET' })
-	.input(getAllCategoriesInput)
-	.output(getAllCategoriesOutput)
+	.input(getAllAuthorsInput)
+	.output(getAllAuthorsOutput)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await getAllCategories({
+			await getAllAuthors({
 				db: context.env['root-db'],
 				...input,
 			}),
@@ -140,29 +106,29 @@ const getAllCategoriesRoute = api
 		);
 	});
 
-const updateCategoryRoute = api
+const updateAuthorRoute = api
 	.route({ method: 'PUT' })
-	.input(updateCategoryInput)
-	.output(CategorySchema)
+	.input(updateAuthorInput)
+	.output(AuthorSchema)
 	.handler(async ({ context, input, errors }) => {
-		const { id, ...category } = input;
+		const { id, ...author } = input;
 		return res(
-			await updateCategory({
+			await updateAuthor({
 				db: context.env['root-db'],
 				id,
-				category,
+				author,
 			}),
 			errors,
 		);
 	});
 
-const deleteCategoryRoute = api
+const deleteAuthorRoute = api
 	.route({ method: 'DELETE' })
-	.input(deleteCategoryInput)
-	.output(deleteCategoryOutput)
+	.input(deleteAuthorInput)
+	.output(deleteAuthorOutput)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await deleteCategory({
+			await deleteAuthor({
 				db: context.env['root-db'],
 				...input,
 			}),
@@ -171,30 +137,30 @@ const deleteCategoryRoute = api
 	});
 
 // ==============================
-// CUSTOMER ROUTES
+// BOOK ROUTES
 // ==============================
 
-const createCustomerRoute = api
+const createBookRoute = api
 	.route({ method: 'POST' })
-	.input(createCustomerInput)
-	.output(CustomerSchema)
+	.input(createBookInput)
+	.output(BookSchema)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await createCustomer({
+			await createBook({
 				db: context.env['root-db'],
-				customer: { ...input },
+				book: { ...input },
 			}),
 			errors,
 		);
 	});
 
-const getCustomerRoute = api
+const getBookRoute = api
 	.route({ method: 'GET' })
-	.input(getCustomerInput)
-	.output(CustomerSchema)
+	.input(getBookInput)
+	.output(BookSchema)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await getCustomer({
+			await getBook({
 				db: context.env['root-db'],
 				...input,
 			}),
@@ -202,13 +168,13 @@ const getCustomerRoute = api
 		);
 	});
 
-const getAllCustomersRoute = api
+const getAllBooksRoute = api
 	.route({ method: 'GET' })
-	.input(getAllCustomersInput)
-	.output(getAllCustomersOutput)
+	.input(getAllBooksInput)
+	.output(getAllBooksOutput)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await getAllCustomers({
+			await getAllBooks({
 				db: context.env['root-db'],
 				...input,
 			}),
@@ -216,13 +182,13 @@ const getAllCustomersRoute = api
 		);
 	});
 
-const searchCustomersRoute = api
+const getBooksByAuthorRoute = api
 	.route({ method: 'GET' })
-	.input(searchCustomersInput)
-	.output(getAllCustomersOutput)
+	.input(getBooksByAuthorInput)
+	.output(getAllBooksOutput)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await searchCustomers({
+			await getBooksByAuthor({
 				db: context.env['root-db'],
 				...input,
 			}),
@@ -230,223 +196,43 @@ const searchCustomersRoute = api
 		);
 	});
 
-const updateCustomerRoute = api
+const searchBooksRoute = api
+	.route({ method: 'GET' })
+	.input(searchBooksInput)
+	.output(getAllBooksOutput)
+	.handler(async ({ context, input, errors }) => {
+		return res(
+			await searchBooks({
+				db: context.env['root-db'],
+				...input,
+			}),
+			errors,
+		);
+	});
+
+const updateBookRoute = api
 	.route({ method: 'PUT' })
-	.input(updateCustomerInput)
-	.output(CustomerSchema)
+	.input(updateBookInput)
+	.output(BookSchema)
 	.handler(async ({ context, input, errors }) => {
-		const { id, ...customer } = input;
+		const { id, ...book } = input;
 		return res(
-			await updateCustomer({
+			await updateBook({
 				db: context.env['root-db'],
 				id,
-				customer,
+				book,
 			}),
 			errors,
 		);
 	});
 
-const deleteCustomerRoute = api
+const deleteBookRoute = api
 	.route({ method: 'DELETE' })
-	.input(deleteCustomerInput)
-	.output(deleteCustomerOutput)
+	.input(deleteBookInput)
+	.output(deleteBookOutput)
 	.handler(async ({ context, input, errors }) => {
 		return res(
-			await deleteCustomer({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-// ==============================
-// PRODUCT ROUTES
-// ==============================
-
-const createProductRoute = api
-	.route({ method: 'POST' })
-	.input(createProductInput)
-	.output(ProductSchema)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await createProduct({
-				db: context.env['root-db'],
-				product: { ...input },
-			}),
-			errors,
-		);
-	});
-
-const getProductRoute = api
-	.route({ method: 'GET' })
-	.input(getProductInput)
-	.output(ProductSchema)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await getProduct({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const getAllProductsRoute = api
-	.route({ method: 'GET' })
-	.input(getAllProductsInput)
-	.output(getAllProductsOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await getAllProducts({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const getProductsByCategoryRoute = api
-	.route({ method: 'GET' })
-	.input(getProductsByCategoryInput)
-	.output(getAllProductsOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await getProductsByCategory({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const searchProductsRoute = api
-	.route({ method: 'GET' })
-	.input(searchProductsInput)
-	.output(getAllProductsOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await searchProducts({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const updateProductRoute = api
-	.route({ method: 'PUT' })
-	.input(updateProductInput)
-	.output(ProductSchema)
-	.handler(async ({ context, input, errors }) => {
-		const { id, ...product } = input;
-		return res(
-			await updateProduct({
-				db: context.env['root-db'],
-				id,
-				product,
-			}),
-			errors,
-		);
-	});
-
-const deleteProductRoute = api
-	.route({ method: 'DELETE' })
-	.input(deleteProductInput)
-	.output(deleteProductOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await deleteProduct({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-// ==============================
-// ORDER ROUTES
-// ==============================
-
-const createOrderRoute = api
-	.route({ method: 'POST' })
-	.input(createOrderInput)
-	.output(OrderSchema)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await createOrder({
-				db: context.env['root-db'],
-				order: { ...input },
-			}),
-			errors,
-		);
-	});
-
-const getOrderRoute = api
-	.route({ method: 'GET' })
-	.input(getOrderInput)
-	.output(OrderSchema)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await getOrder({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const getAllOrdersRoute = api
-	.route({ method: 'GET' })
-	.input(getAllOrdersInput)
-	.output(getAllOrdersOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await getAllOrders({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const getOrdersByCustomerRoute = api
-	.route({ method: 'GET' })
-	.input(getOrdersByCustomerInput)
-	.output(getAllOrdersOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await getOrdersByCustomer({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const updateOrderRoute = api
-	.route({ method: 'PUT' })
-	.input(updateOrderInput)
-	.output(OrderSchema)
-	.handler(async ({ context, input, errors }) => {
-		const { id, ...order } = input;
-		return res(
-			await updateOrder({
-				db: context.env['root-db'],
-				id,
-				order,
-			}),
-			errors,
-		);
-	});
-
-const deleteOrderRoute = api
-	.route({ method: 'DELETE' })
-	.input(deleteOrderInput)
-	.output(deleteOrderOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await deleteOrder({
+			await deleteBook({
 				db: context.env['root-db'],
 				...input,
 			}),
@@ -459,37 +245,21 @@ const deleteOrderRoute = api
 // ==============================
 
 export const router = {
-	categories: {
-		create: createCategoryRoute,
-		get: getCategoryRoute,
-		getAll: getAllCategoriesRoute,
-		update: updateCategoryRoute,
-		delete: deleteCategoryRoute,
+	authors: {
+		create: createAuthorRoute,
+		get: getAuthorRoute,
+		getAll: getAllAuthorsRoute,
+		update: updateAuthorRoute,
+		delete: deleteAuthorRoute,
 	},
-	customers: {
-		create: createCustomerRoute,
-		get: getCustomerRoute,
-		getAll: getAllCustomersRoute,
-		search: searchCustomersRoute,
-		update: updateCustomerRoute,
-		delete: deleteCustomerRoute,
-	},
-	products: {
-		create: createProductRoute,
-		get: getProductRoute,
-		getAll: getAllProductsRoute,
-		getByCategory: getProductsByCategoryRoute,
-		search: searchProductsRoute,
-		update: updateProductRoute,
-		delete: deleteProductRoute,
-	},
-	orders: {
-		create: createOrderRoute,
-		get: getOrderRoute,
-		getAll: getAllOrdersRoute,
-		getByCustomer: getOrdersByCustomerRoute,
-		update: updateOrderRoute,
-		delete: deleteOrderRoute,
+	books: {
+		create: createBookRoute,
+		get: getBookRoute,
+		getAll: getAllBooksRoute,
+		getByAuthor: getBooksByAuthorRoute,
+		search: searchBooksRoute,
+		update: updateBookRoute,
+		delete: deleteBookRoute,
 	},
 };
 

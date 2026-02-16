@@ -17,10 +17,8 @@ What happens next depends on the environment.
 import { D1Seeder } from '@gasdotdev/plugin-cloudflare/d1-seeder';
 import { rootDb } from '../func.ts';
 import { faker } from '@faker-js/faker';
-import { createCategory } from './category.ts';
-import { createCustomer } from './customer.ts';
-import { createProduct } from './product.ts';
-import { createOrder } from './order.ts';
+import { createAuthor } from './author.ts';
+import { createBook } from './book.ts';
 
 export async function seed() {
 	// Keep data consistent across seeds
@@ -36,66 +34,28 @@ export async function seed() {
 
 	console.log('running seeder');
 
-	// Store IDs for relational seeding
-	const categoryIds: string[] = [];
-	const customerIds: string[] = [];
-	const productIds: string[] = [];
+	const authorIds: string[] = [];
 
-	console.log('creating categories...');
+	console.log('creating authors...');
 
-	const categoryNames = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports'];
-	for (const name of categoryNames) {
-		const result = await createCategory({
+	for (let i = 0; i < 10; i++) {
+		const result = await createAuthor({
 			db,
-			category: {
-				name,
-				description: faker.commerce.department(),
+			author: {
+				name: faker.person.fullName(),
 			},
 		});
-		if (result.ok) categoryIds.push(result.val.id);
+		if (result.ok) authorIds.push(result.val.id);
 	}
 
-	console.log('creating customers...');
-
-	for (let i = 0; i < 25; i++) {
-		const result = await createCustomer({
-			db,
-			customer: {
-				firstName: faker.person.firstName(),
-				lastName: faker.person.lastName(),
-				address: faker.location.streetAddress(),
-				city: faker.location.city(),
-				state: faker.location.state(),
-				postalCode: faker.location.zipCode(),
-				country: faker.location.country(),
-			},
-		});
-		if (result.ok) customerIds.push(result.val.id);
-	}
-
-	console.log('creating products...');
+	console.log('creating books...');
 
 	for (let i = 0; i < 50; i++) {
-		const result = await createProduct({
+		await createBook({
 			db,
-			product: {
-				name: faker.commerce.productName(),
-				categoryId: faker.helpers.arrayElement(categoryIds),
-				price: parseFloat(faker.commerce.price()),
-			},
-		});
-		if (result.ok) productIds.push(result.val.id);
-	}
-
-	console.log('creating orders...');
-
-	for (let i = 0; i < 100; i++) {
-		await createOrder({
-			db,
-			order: {
-				customerId: faker.helpers.arrayElement(customerIds),
-				date: faker.date.past().getTime(),
-				cost: parseFloat(faker.commerce.price()),
+			book: {
+				authorId: faker.helpers.arrayElement(authorIds),
+				title: faker.lorem.words({ min: 2, max: 5 }),
 			},
 		});
 	}
