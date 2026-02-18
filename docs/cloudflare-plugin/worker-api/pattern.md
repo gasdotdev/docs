@@ -1,16 +1,8 @@
-# Worker API Example
+# Worker API Pattern
 
-Worker APIs use oRPC.
-
-The API itself should be "dumb".
-
-All core logic is pushed into [reusable database functions](../d1/main.md).
-
-oRPC docs: https://orpc.dev/docs/getting-started
-
-oRPC OpenAPI docs: https://orpc.dev/docs/openapi/getting-started
-
-oRPC llms.txt: https://orpc.dev/llms.txt
+- oRPC docs: https://orpc.dev/docs/getting-started
+- oRPC OpenAPI docs: https://orpc.dev/docs/openapi/getting-started
+- oRPC llms.txt: https://orpc.dev/llms.txt
 
 `gas/api/src/index.ts`:
 ```ts

@@ -1,6 +1,7 @@
 # Worker API Testing
 
-Tests can be ran for individual resources using this command: `npm run test --workspace=<resource_name>`
+- Run individual Worker API tests with `npm run test --workspace=<resource_name>`
+- Run the entire test suite with `npm run test`
 
 ## Example
 
