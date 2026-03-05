@@ -15,4 +15,4 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 ### Worker API
 
 - [Worker API Pattern](./docs/cloudflare-plugin/worker-api/pattern.md)
-- [Worker API Testing](./docs/cloudflare-plugin/worker-api/testing.md)
+- [Worker API - Testing - D1 - Create Methods](./docs/cloudflare-plugin/worker-api/testing-d1-create-methods.md)
