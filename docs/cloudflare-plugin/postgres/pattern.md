@@ -2,8 +2,7 @@
 
 ## Example
 
-## Database Functions (`gas/db/src/book.ts`)
-
+`gas/db/src/book.ts`:
 ```ts
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
