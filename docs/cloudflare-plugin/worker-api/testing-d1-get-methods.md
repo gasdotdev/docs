@@ -1,4 +1,4 @@
-# Worker API - Testing - D1 - Create Methods
+# Worker API - Testing - D1 - Get Methods
 
 ## Example
 
@@ -38,45 +38,47 @@ after(async () => {
 	await testWorker.stop();
 });
 
-describe('root-api:books:create', () => {
-  it('should create a valid book', async () => {
-		const book = {
+describe('root-api:books:get', () => {
+  it('should get an existing book', async () => {
+		const bookData = {
 			authorId: testAuthorId,
 			title: faker.lorem.words({ min: 2, max: 5 }),
 		};
 
-		const result = await client.books.create(book);
+		const createResult = await createBook({
+			db: testWorker.d1Databases['root-db'],
+			book: bookData,
+		});
 
-		assert.strictEqual(result.authorId, book.authorId);
-		assert.strictEqual(result.title, book.title);
-		assert.ok(result.id);
+		assert(!createResult.err);
+
+		const getResult = await client.books.get({ id: createResult.id });
+
+		assert.strictEqual(getResult.id, createResult.id);
+		assert.strictEqual(getResult.authorId, bookData.authorId);
+		assert.strictEqual(getResult.title, bookData.title);
 
 		await deleteBook({
 			db: testWorker.d1Databases['root-db'],
-			id: result.id,
+			id: createResult.id,
 		});
 	});
 
-	it('should return 400 for invalid author ID', async () => {
-		const book = {
-			authorId: 'non-existent-author',
-			title: faker.lorem.words({ min: 2, max: 5 }),
-		};
-
-		const [error, data] = await safe(client.books.create(book));
+	it('should return 404 for non-existent book', async () => {
+		const [error, data] = await safe(
+			client.books.get({ id: 'non-existent-id' }),
+		);
 
 		assert.strictEqual(data, undefined);
 		assert.ok(error instanceof ORPCError);
+		assert.strictEqual(error.status, 404);
 		assert.ok(error.message);
 	});
 
-	it('should return 400 for invalid book data', async () => {
-		const invalidBookData = {
-			authorId: 123 as any,
-			title: faker.lorem.words({ min: 2, max: 5 }),
-		};
-
-		const [error, data] = await safe(client.books.create(invalidBookData));
+	it('should return 400 for invalid book ID', async () => {
+		const [error, data] = await safe(
+			client.books.get({ id: 123 as any }),
+		);
 
 		assert.strictEqual(data, undefined);
 		assert.ok(error instanceof ORPCError);
