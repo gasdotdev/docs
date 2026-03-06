@@ -1,4 +1,4 @@
-# ORPC Documentation Links
+# ORPC Docs
 
 If AI, see: https://orpc.dev/llms.txt
 

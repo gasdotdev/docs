@@ -14,7 +14,7 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 
 ### Worker API
 
-- [ORPC - Documentation Links](./doc/cloudflare-plugin/worker-api/orpc.md)
+- [ORPC - Docs](./doc/cloudflare-plugin/worker-api/orpc-docs.md)
 - [Pattern - D1 Binding](./docs/cloudflare-plugin/worker-api/pattern-d1-binding.md)
 - [Testing - D1 - Create Methods](./docs/cloudflare-plugin/worker-api/testing-d1-create-methods.md)
 - [Testing - D1 - Delete Methods](./docs/cloudflare-plugin/worker-api/testing-d1-delete-methods.md)
