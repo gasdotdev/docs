@@ -39,7 +39,7 @@ after(async () => {
 });
 
 describe('root-api:books:create', () => {
-  it('should create a valid book', async () => {
+	it('should create a valid book', async () => {
 		const book = {
 			authorId: testAuthorId,
 			title: faker.lorem.words({ min: 2, max: 5 }),
