@@ -14,12 +14,12 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 
 ### Worker API
 
-- [Worker API Pattern](./docs/cloudflare-plugin/worker-api/pattern.md)
-- [Worker API - Testing - D1 - Create Methods](./docs/cloudflare-plugin/worker-api/testing-d1-create-methods.md)
-- [Worker API - Testing - D1 - Delete Methods](./docs/cloudflare-plugin/worker-api/testing-d1-delete-methods.md)
-- [Worker API - Testing - D1 - Get All Methods](./docs/cloudflare-plugin/worker-api/testing-d1-get-all-methods.md)
-- [Worker API - Testing - D1 - Get By Methods](./docs/cloudflare-plugin/worker-api/testing-d1-get-by-methods.md)
-- [Worker API - Testing - D1 - Get Methods](./docs/cloudflare-plugin/worker-api/testing-d1-get-methods.md)
-- [Worker API - Testing - D1 - Search Methods](./docs/cloudflare-plugin/worker-api/testing-d1-search-methods.md)
-- [Worker API - Testing - D1 - Update Methods](./docs/cloudflare-plugin/worker-api/testing-d1-update-methods.md)
-- [Worker API - Testing - Postgres - TODO Methods](./docs/cloudflare-plugin/worker-api/testing-postgres.md)
+- [Pattern](./docs/cloudflare-plugin/worker-api/pattern.md)
+- [Testing - D1 - Create Methods](./docs/cloudflare-plugin/worker-api/testing-d1-create-methods.md)
+- [Testing - D1 - Delete Methods](./docs/cloudflare-plugin/worker-api/testing-d1-delete-methods.md)
+- [Testing - D1 - Get All Methods](./docs/cloudflare-plugin/worker-api/testing-d1-get-all-methods.md)
+- [Testing - D1 - Get By Methods](./docs/cloudflare-plugin/worker-api/testing-d1-get-by-methods.md)
+- [Testing - D1 - Get Methods](./docs/cloudflare-plugin/worker-api/testing-d1-get-methods.md)
+- [Testing - D1 - Search Methods](./docs/cloudflare-plugin/worker-api/testing-d1-search-methods.md)
+- [Testing - D1 - Update Methods](./docs/cloudflare-plugin/worker-api/testing-d1-update-methods.md)
+- [Testing - Postgres - TODO Methods](./docs/cloudflare-plugin/worker-api/testing-postgres.md)
