@@ -1,4 +1,4 @@
-# Worker API Pattern
+# Worker API - Pattern - D1 Binding
 
 - oRPC docs: https://orpc.dev/docs/getting-started
 - oRPC OpenAPI docs: https://orpc.dev/docs/openapi/getting-started
