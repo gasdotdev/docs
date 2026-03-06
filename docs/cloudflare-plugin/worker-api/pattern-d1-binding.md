@@ -9,21 +9,6 @@
 import { os } from '@orpc/server';
 import { RPCHandler } from '@orpc/server/fetch';
 import {
-	createAuthor,
-	createAuthorInput,
-	getAuthor,
-	getAuthorInput,
-	getAllAuthors,
-	getAllAuthorsInput,
-	getAllAuthorsOutput,
-	updateAuthor,
-	updateAuthorInput,
-	deleteAuthor,
-	deleteAuthorInput,
-	deleteAuthorOutput,
-	AuthorSchema,
-} from '../../db/src/author.ts';
-import {
 	createBook,
 	createBookInput,
 	getBook,
@@ -51,82 +36,6 @@ const rateLimit = base.middleware(async ({ next, errors }) => {
 });
 
 const api = base.use(rateLimit);
-
-// ==============================
-// AUTHOR ROUTES
-// ==============================
-
-const createAuthorRoute = api
-	.route({ method: 'POST' })
-	.input(createAuthorInput)
-	.output(AuthorSchema)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await createAuthor({
-				db: context.env['root-db'],
-				author: { ...input },
-			}),
-			errors,
-		);
-	});
-
-const getAuthorRoute = api
-	.route({ method: 'GET' })
-	.input(getAuthorInput)
-	.output(AuthorSchema)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await getAuthor({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const getAllAuthorsRoute = api
-	.route({ method: 'GET' })
-	.input(getAllAuthorsInput)
-	.output(getAllAuthorsOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await getAllAuthors({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
-
-const updateAuthorRoute = api
-	.route({ method: 'PUT' })
-	.input(updateAuthorInput)
-	.output(AuthorSchema)
-	.handler(async ({ context, input, errors }) => {
-		const { id, ...author } = input;
-		return res(
-			await updateAuthor({
-				db: context.env['root-db'],
-				id,
-				author,
-			}),
-			errors,
-		);
-	});
-
-const deleteAuthorRoute = api
-	.route({ method: 'DELETE' })
-	.input(deleteAuthorInput)
-	.output(deleteAuthorOutput)
-	.handler(async ({ context, input, errors }) => {
-		return res(
-			await deleteAuthor({
-				db: context.env['root-db'],
-				...input,
-			}),
-			errors,
-		);
-	});
 
 // ==============================
 // BOOK ROUTES
@@ -237,13 +146,6 @@ const deleteBookRoute = api
 // ==============================
 
 export const router = {
-	authors: {
-		create: createAuthorRoute,
-		get: getAuthorRoute,
-		getAll: getAllAuthorsRoute,
-		update: updateAuthorRoute,
-		delete: deleteAuthorRoute,
-	},
 	books: {
 		create: createBookRoute,
 		get: getBookRoute,
