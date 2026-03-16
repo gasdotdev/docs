@@ -14,6 +14,7 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 
 ### Postgres
 
+- [Postgres Pattern](./docs/cloudflare-plugin/postgres/migrations.md)
 - [Postgres Pattern](./docs/cloudflare-plugin/postgres/pattern.md)
 
 ### Worker API
