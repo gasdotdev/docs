@@ -8,14 +8,14 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 
 ### D1
 
-- [D1 Migrations](./docs/cloudflare-plugin/d1/migrations.md)
-- [D1 Pattern](./docs/cloudflare-plugin/d1/pattern.md)
-- [D1 Seeding](./docs/cloudflare-plugin/d1/seeding.md)
+- [Migrations](./docs/cloudflare-plugin/d1/migrations.md)
+- [Pattern - Entities](./docs/cloudflare-plugin/d1/pattern-entities.md)
+- [Seeding](./docs/cloudflare-plugin/d1/seeding.md)
 
 ### Postgres
 
-- [Postgres Migrations](./docs/cloudflare-plugin/postgres/migrations.md)
-- [Postgres Pattern](./docs/cloudflare-plugin/postgres/pattern.md)
+- [Migrations](./docs/cloudflare-plugin/postgres/migrations.md)
+- [Pattern - Entities](./docs/cloudflare-plugin/postgres/pattern-entities.md)
 
 ### Worker API
 

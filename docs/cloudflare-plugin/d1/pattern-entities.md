@@ -1,4 +1,4 @@
-# D1 Pattern
+# D1 - Pattern - Entities
 
 The preferred pattern for modeling entities with D1.
 

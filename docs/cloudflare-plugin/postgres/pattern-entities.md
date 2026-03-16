@@ -1,4 +1,4 @@
-# Postgres Pattern
+# Postgres - Pattern - Entities
 
 The preferred pattern for modeling entities with Postgres.
 
