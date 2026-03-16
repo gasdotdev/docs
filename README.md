@@ -4,6 +4,14 @@
 
 A framework for creating, deploying, and managing Cloudflare-infused projects with type-safe code.
 
+## AWS Plugin
+
+### RDS Postgres
+
+- [Migrations](./docs/aws-plugin/rds-postgres/migrations.md)
+- [Pattern - Entities](./docs/aws-plugin/rds-postgres/pattern-entities.md)
+- [Seeding](./docs/aws-plugin/rds-postgres/seeding.md)
+
 ## Cloudflare Plugin
 
 ### D1
@@ -11,11 +19,6 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 - [Migrations](./docs/cloudflare-plugin/d1/migrations.md)
 - [Pattern - Entities](./docs/cloudflare-plugin/d1/pattern-entities.md)
 - [Seeding](./docs/cloudflare-plugin/d1/seeding.md)
-
-### Postgres
-
-- [Migrations](./docs/cloudflare-plugin/postgres/migrations.md)
-- [Pattern - Entities](./docs/cloudflare-plugin/postgres/pattern-entities.md)
 
 ### Worker API
 

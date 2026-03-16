@@ -81,7 +81,7 @@ after(async () => {
 });
 ```
 
-## Create Methods
+## Example Create Methods
 
 `gas/api/src/books.test.ts`:
 ```ts
@@ -133,7 +133,7 @@ describe('root-api:books:create', () => {
 });
 ```
 
-## Get Methods
+## Example Get Methods
 
 `gas/api/src/books.test.ts`:
 ```ts
@@ -187,7 +187,7 @@ describe('root-api:books:get', () => {
 });
 ```
 
-## Get All
+## Example Get All Methods
 
 `gas/api/src/books.test.ts`:
 ```ts
@@ -333,7 +333,7 @@ describe('root-api:books:getAll', () => {
 });
 ```
 
-## Get By Methods
+## Example Get By Methods
 
 `gas/api/src/books.test.ts`:
 ```ts
@@ -435,7 +435,7 @@ describe('root-api:books:getBy', () => {
 });
 ```
 
-## Search Methods
+## Example Search Methods
 
 `gas/api/src/books.test.ts`:
 ```ts
@@ -537,7 +537,7 @@ describe('root-api:books:search', () => {
 });
 ```
 
-## Update Methods
+## Example Update Methods
 
 `gas/api/src/books.test.ts`:
 ```ts
@@ -647,7 +647,7 @@ describe('root-api:books:update', () => {
 });
 ```
 
-## Delete Methods
+## Example Delete Methods
 
 `gas/api/src/books.test.ts`:
 ```ts
