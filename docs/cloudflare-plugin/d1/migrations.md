@@ -42,7 +42,7 @@ Migrations are automatically applied during development.
 
 ## Applying Migrations in Staging
 
-Migrations in staging are ran automatically during deployment when a D1 resource's `migrate` param is set in its `func.ts`.
+Migrations in staging are ran automatically during deployment when a D1 resource's `migrate` param is set in its `params.ts`.
 
 During deployment, the `migrate` param becomes a separate sub-resource (`root-db:migrate`) in the dependency graph. That ensures migrations run after the database is created but before Workers that depend on it.
 
@@ -62,7 +62,7 @@ In this example, a `root-db` D1 resource exists.
 
 Its migrations run on `production` stage deployments whenever migration files change. Other stage deployments, like `preview`, would skip migrations entirely because the seeding process handles migrations instead.
 
-`./gas/db/func.ts`:
+`./gas/db/params.ts`:
 
 ```ts
 import { defineCfD1 } from '@gasdotdev/plugin-cloudflare/definitions';

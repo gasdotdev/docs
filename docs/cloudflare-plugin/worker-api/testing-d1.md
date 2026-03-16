@@ -11,7 +11,7 @@ import {
 	type TestWorker,
 } from '@gasdotdev/plugin-cloudflare/test/worker';
 import { after, before, it, describe } from 'node:test';
-import { rootApi } from '../../func.ts';
+import { rootApi } from '../../params.ts';
 import assert from 'node:assert';
 import { faker } from '@faker-js/faker';
 import { createORPCClient, safe } from '@orpc/client';

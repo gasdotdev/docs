@@ -11,7 +11,7 @@ import {
 	type TestWorker,
 } from '@gasdotdev/plugin-cloudflare/test/worker';
 import { after, before, it, describe } from 'node:test';
-import { rootApi } from '../../func.ts';
+import { rootApi } from '../../params.ts';
 import assert from 'node:assert';
 import { faker } from '@faker-js/faker';
 import { createORPCClient, safe } from '@orpc/client';
@@ -25,7 +25,7 @@ import {
 import { Client } from 'pg';
 import { migrateUp } from '@gasdotdev/gas/postgres';
 import { router } from '../index.ts';
-import { getRootDbParams } from 'root-db/func.ts';
+import { getRootDbParams } from 'root-db/params.ts';
 import {
 	createBook,
 	deleteBook,

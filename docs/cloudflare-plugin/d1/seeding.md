@@ -15,7 +15,7 @@ What happens next depends on the environment.
 
 ```ts
 import { D1Seeder } from '@gasdotdev/plugin-cloudflare/d1-seeder';
-import { rootDb } from '../func.ts';
+import { rootDb } from '../params.ts';
 import { faker } from '@faker-js/faker';
 import { createAuthor } from './author.ts';
 import { createBook } from './book.ts';
@@ -83,7 +83,7 @@ The Cloudflare plugin dev server also watches `_seeds.ts` and will re-run the pr
 
 ## Seeding in Staging
 
-Seeding is handled automatically during staging when a D1 resource's when a D1 resource's `seed` param is set in its `func.ts` and the resource has a `_seed.ts` file.
+Seeding is handled automatically during staging when a D1 resource's when a D1 resource's `seed` param is set in its `params.ts` and the resource has a `_seed.ts` file.
 
 During deployment, the `seed` param becomes a separate sub-resource (`root-db:seed`) in the dependency graph. That ensures seeds run after the database is created but before Workers that depend on it.
 
@@ -91,7 +91,7 @@ When `onChange` files have changed since the last deployment, the deployment run
 
 In this example, seeding will occur during `preview` stage deployments whenever migration or source files have changed. Other stage deployments, like production, will skip seeding entirely.
 
-`./gas/db/func.ts`:
+`./gas/db/params.ts`:
 
 ```ts
 import { defineCfD1 } from '@gasdotdev/plugin-cloudflare/definitions';
