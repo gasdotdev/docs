@@ -1,0 +1,20 @@
+```sql
+-- migrate:up
+DROP TABLE IF EXISTS "Book";
+DROP TABLE IF EXISTS "Author";
+
+CREATE TABLE IF NOT EXISTS "Author" (
+  "id" VARCHAR(21) PRIMARY KEY,
+  "name" VARCHAR(100) NULL
+);
+
+CREATE TABLE IF NOT EXISTS "Book" (
+  "id" VARCHAR(21) PRIMARY KEY,
+  "authorId" VARCHAR(21) NOT NULL,
+  "title" VARCHAR(200) NULL
+);
+
+-- migrate:down
+DROP TABLE IF EXISTS "Book";
+DROP TABLE IF EXISTS "Author";
+```
