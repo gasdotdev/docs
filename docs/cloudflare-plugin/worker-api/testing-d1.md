@@ -1,6 +1,6 @@
-# Worker API - Testing - Postgres
+# Worker API - Testing - D1
 
-The preferred pattern for testing a Worker API that uses Postgres.
+The preferred pattern for testing a Worker API that uses D1.
 
 ## Setup
 
@@ -18,51 +18,13 @@ import { createORPCClient, safe } from '@orpc/client';
 import { RPCLink } from '@orpc/client/fetch';
 import type { RouterClient } from '@orpc/server';
 import { ORPCError } from '@orpc/server';
-import {
-	PostgreSqlContainer,
-	type StartedPostgreSqlContainer,
-} from '@testcontainers/postgresql';
-import { Client } from 'pg';
-import { migrateUp } from '@gasdotdev/gas/postgres';
 import { router } from '../index.ts';
-import { getRootDbParams } from 'root-db/func.ts';
-import {
-	createBook,
-	deleteBook,
-} from 'root-db/book.ts';
-import {
-	createAuthor,
-	deleteAuthor,
-} from 'root-db/author.ts';
+import { createBook } from 'root-db/book.ts';
 
-let pgContainer: StartedPostgreSqlContainer;
-let pgClient: Client;
 let testWorker: TestWorker<typeof rootApi>;
 let client: RouterClient<typeof router>;
 
 before(async () => {
-	const rootDbParams = await getRootDbParams();
-
-	pgContainer = await new PostgreSqlContainer(rootDbParams.image)
-		.withUsername(rootDbParams.user)
-		.withPassword(rootDbParams.password)
-		.withDatabase(rootDbParams.name)
-		.withExposedPorts({
-			container: rootDbParams.containerPort,
-			host: rootDbParams.port,
-		})
-		.start();
-
-	await migrateUp({
-		connectionString: pgContainer.getConnectionUri(),
-		migrationsPath: rootDbParams.migrationsPath,
-	});
-
-	pgClient = new Client({
-		connectionString: pgContainer.getConnectionUri(),
-	});
-	await pgClient.connect();
-
 	testWorker = await startTestWorker({
 		resourceParams: rootApi,
 	});
@@ -75,9 +37,7 @@ before(async () => {
 });
 
 after(async () => {
-	await pgClient.end();
 	await testWorker.stop();
-	await pgContainer.stop();
 });
 ```
 
@@ -99,7 +59,7 @@ describe('root-api:books:create', () => {
 		assert.ok(result.id);
 
 		await deleteBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			id: result.id,
 		});
 	});
@@ -145,7 +105,7 @@ describe('root-api:books:get', () => {
 		};
 
 		const createResult = await createBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			book: bookData,
 		});
 
@@ -158,7 +118,7 @@ describe('root-api:books:get', () => {
 		assert.strictEqual(getResult.title, bookData.title);
 
 		await deleteBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			id: createResult.id,
 		});
 	});
@@ -196,7 +156,7 @@ describe('root-api:books:getAll', () => {
 		const books = [];
 		for (let i = 0; i < count; i++) {
 			const createResult = await createBook({
-				db: pgClient,
+				db: testWorker.d1Databases['root-db'],
 				book: {
 					authorId: testAuthorId,
 					title: `Book ${i + 1}`,
@@ -212,7 +172,7 @@ describe('root-api:books:getAll', () => {
 	async function cleanupTestBooks(bookIds: string[]) {
 		for (const id of bookIds) {
 			await deleteBook({
-				db: pgClient,
+				db: testWorker.d1Databases['root-db'],
 				id,
 			});
 		}
@@ -340,7 +300,7 @@ describe('root-api:books:getAll', () => {
 describe('root-api:books:getBy', () => {
   it('should get books by author ID', async () => {
 		const createResult = await createBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			book: {
 				authorId: testAuthorId,
 				title: faker.lorem.words({ min: 2, max: 5 }),
@@ -361,14 +321,14 @@ describe('root-api:books:getBy', () => {
 		);
 
 		await deleteBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			id: createResult.id,
 		});
 	});
 
 	it('should return empty array for author with no books', async () => {
 		const authorResult = await createAuthor({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			author: { name: 'Empty Author' },
 		});
 
@@ -384,7 +344,7 @@ describe('root-api:books:getBy', () => {
 		assert.strictEqual(result.pagination.total, 0);
 
 		await deleteAuthor({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			id: authorResult.id,
 		});
 	});
@@ -394,7 +354,7 @@ describe('root-api:books:getBy', () => {
 
 		for (let i = 0; i < 8; i++) {
 			const createResult = await createBook({
-				db: pgClient,
+				db: testWorker.d1Databases['root-db'],
 				book: {
 					authorId: testAuthorId,
 					title: `Paginated Book ${i + 1}`,
@@ -427,7 +387,7 @@ describe('root-api:books:getBy', () => {
 
 		for (const bookId of bookIds) {
 			await deleteBook({
-				db: pgClient,
+				db: testWorker.d1Databases['root-db'],
 				id: bookId,
 			});
 		}
@@ -442,7 +402,7 @@ describe('root-api:books:getBy', () => {
 describe('root-api:books:search', () => {
   it('should find books by title', async () => {
 		const createResult = await createBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			book: {
 				authorId: testAuthorId,
 				title: 'Unique Searchable Title',
@@ -465,7 +425,7 @@ describe('root-api:books:search', () => {
 		);
 
 		await deleteBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			id: createResult.id,
 		});
 	});
@@ -486,7 +446,7 @@ describe('root-api:books:search', () => {
 
 		for (let i = 0; i < 8; i++) {
 			const createResult = await createBook({
-				db: pgClient,
+				db: testWorker.d1Databases['root-db'],
 				book: {
 					authorId: testAuthorId,
 					title: `Searchable Pattern ${i + 1}`,
@@ -518,7 +478,7 @@ describe('root-api:books:search', () => {
 
 		for (const bookId of bookIds) {
 			await deleteBook({
-				db: pgClient,
+				db: testWorker.d1Databases['root-db'],
 				id: bookId,
 			});
 		}
@@ -544,7 +504,7 @@ describe('root-api:books:search', () => {
 describe('root-api:books:update', () => {
   it('should update existing book', async () => {
 		const createResult = await createBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			book: {
 				authorId: testAuthorId,
 				title: 'Original Title',
@@ -566,7 +526,7 @@ describe('root-api:books:update', () => {
 		assert.strictEqual(getResult.title, 'Updated Title');
 
 		await deleteBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			id: createResult.id,
 		});
 	});
@@ -588,7 +548,7 @@ describe('root-api:books:update', () => {
 
 	it('should return 400 for invalid author ID on update', async () => {
 		const createResult = await createBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			book: {
 				authorId: testAuthorId,
 				title: faker.lorem.words({ min: 2, max: 5 }),
@@ -610,14 +570,14 @@ describe('root-api:books:update', () => {
 		assert.ok(error.message);
 
 		await deleteBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			id: createResult.id,
 		});
 	});
 
 	it('should return 400 for invalid book data', async () => {
 		const createResult = await createBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			book: {
 				authorId: testAuthorId,
 				title: faker.lorem.words({ min: 2, max: 5 }),
@@ -640,7 +600,7 @@ describe('root-api:books:update', () => {
 		assert.ok(error.message);
 
 		await deleteBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			id: createResult.id,
 		});
 	});
@@ -654,7 +614,7 @@ describe('root-api:books:update', () => {
 describe('root-api:books:delete', () => {
   it('should delete existing book', async () => {
 		const createResult = await createBook({
-			db: pgClient,
+			db: testWorker.d1Databases['root-db'],
 			book: {
 				authorId: testAuthorId,
 				title: faker.lorem.words({ min: 2, max: 5 }),

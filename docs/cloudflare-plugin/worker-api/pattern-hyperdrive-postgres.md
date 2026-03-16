@@ -1,5 +1,7 @@
 # Worker API - Pattern - Hyperdrive + Postgres
 
+The preferred pattern for using Hyperdrive and Postgres in a Worker API.
+
 ## Example
 
 `gas/api/src/index.ts`:

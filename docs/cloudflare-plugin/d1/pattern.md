@@ -1,5 +1,9 @@
 # D1 Pattern
 
+The preferred pattern for modeling entities with D1.
+
+## Example
+
 `gas/db/src/author.ts`:
 ```ts
 import { nanoid } from 'nanoid';

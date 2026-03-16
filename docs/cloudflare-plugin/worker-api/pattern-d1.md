@@ -1,5 +1,9 @@
 # Worker API - Pattern - D1
 
+The preferred pattern for using D1 in a Worker API.
+
+## Example
+
 `gas/api/src/index.ts`:
 ```ts
 import { os } from '@orpc/server';

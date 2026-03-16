@@ -1,5 +1,7 @@
 # Postgres Pattern
 
+The preferred pattern for modeling entities with Postgres.
+
 ## Example
 
 `gas/db/src/book.ts`:
