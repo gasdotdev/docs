@@ -1,4 +1,4 @@
-# Worker API - Pattern - Postgres Connection
+# Worker API - Pattern - Hyperdrive + Postgres
 
 ## Example
 
