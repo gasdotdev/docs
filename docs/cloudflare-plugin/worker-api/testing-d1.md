@@ -4,7 +4,7 @@ The preferred pattern for testing a Worker API that uses D1.
 
 ## Setup
 
-`gas/api/src/test/books.test.ts`:
+`gas/api/src/books.test.ts`:
 ```ts
 import {
 	startTestWorker,
@@ -43,7 +43,7 @@ after(async () => {
 
 ## Create Methods
 
-`gas/api/src/test/books.test.ts`:
+`gas/api/src/books.test.ts`:
 ```ts
 describe('root-api:books:create', () => {
 	it('should create a valid book', async () => {
@@ -95,7 +95,7 @@ describe('root-api:books:create', () => {
 
 ## Get Methods
 
-`gas/api/src/test/books.test.ts`:
+`gas/api/src/books.test.ts`:
 ```ts
 describe('root-api:books:get', () => {
   it('should get an existing book', async () => {
@@ -149,7 +149,7 @@ describe('root-api:books:get', () => {
 
 ## Get All
 
-`gas/api/src/test/books.test.ts`:
+`gas/api/src/books.test.ts`:
 ```ts
 describe('root-api:books:getAll', () => {
   async function createTestBooks(count: number) {
@@ -295,7 +295,7 @@ describe('root-api:books:getAll', () => {
 
 ## Get By Methods
 
-`gas/api/src/test/books.test.ts`:
+`gas/api/src/books.test.ts`:
 ```ts
 describe('root-api:books:getBy', () => {
   it('should get books by author ID', async () => {
@@ -397,7 +397,7 @@ describe('root-api:books:getBy', () => {
 
 ## Search Methods
 
-`gas/api/src/test/books.test.ts`:
+`gas/api/src/books.test.ts`:
 ```ts
 describe('root-api:books:search', () => {
   it('should find books by title', async () => {
@@ -499,7 +499,7 @@ describe('root-api:books:search', () => {
 
 ## Update Methods
 
-`gas/api/src/test/books.test.ts`:
+`gas/api/src/books.test.ts`:
 ```ts
 describe('root-api:books:update', () => {
   it('should update existing book', async () => {
@@ -609,7 +609,7 @@ describe('root-api:books:update', () => {
 
 ## Delete Methods
 
-`gas/api/src/test/books.test.ts`:
+`gas/api/src/books.test.ts`:
 ```ts
 describe('root-api:books:delete', () => {
   it('should delete existing book', async () => {
