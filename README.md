@@ -4,6 +4,10 @@
 
 A framework for creating, deploying, and managing Cloudflare-infused projects with type-safe code.
 
+## Requirements
+
+- dnsmasq for localhost domain routing (see [Installation](./docs/dnsmasq/installation.md) to set up)
+
 ## AWS Plugin
 
 ### RDS Postgres
