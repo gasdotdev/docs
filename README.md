@@ -6,7 +6,8 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 
 ## Requirements
 
-- dnsmasq for localhost domain routing (see [Installation](./docs/dnsmasq/installation.md) to set up)
+- [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html) for localhost domain routing (see [Install](./docs/dnsmasq/install.md))
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) if running plugins, like AWS, that use Docker containers
 
 ## AWS Plugin
 

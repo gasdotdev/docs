@@ -1,4 +1,4 @@
-# dnsmasq Installation
+# dnsmasq Install
 
 `dnsmasq` is used for local development hostnames like `app.test`, `api.test`, or `foo.bar.test`.
 
