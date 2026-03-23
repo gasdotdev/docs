@@ -2,7 +2,7 @@
 
 Seeders exist in the corresponding resource's `_seed.ts` file and are ran:
 
-- On `gas dev:start`, after the dev Postgres container starts and migrations finish.
+- On `gas dev:start`, after the plugin's dev Postgres container starts and migrations finish.
 - On Postgres migration file changes in dev mode, after the database is reset and migrations re-run.
 - On `_seed.ts` create/update in dev mode.
 - During deployment, against the remote RDS Postgres database, if seeding is configured in the resource's `params.ts` file.

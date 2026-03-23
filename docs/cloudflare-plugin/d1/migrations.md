@@ -1,6 +1,6 @@
 # D1 Migrations
 
-## Defining Migrations
+## Define Migrations
 
 Migrations are configured in the D1 resource's `params.ts` file using the `migrate` property.
 
