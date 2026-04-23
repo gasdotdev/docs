@@ -9,6 +9,10 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 - [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html) for localhost domain routing (see [Install](./docs/dnsmasq/install.md))
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) if running plugins, like AWS, that use Docker containers
 
+## Core
+
+- [Keys](./docs/keys.md)
+
 ## AWS Plugin
 
 ### RDS Postgres
