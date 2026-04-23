@@ -8,21 +8,12 @@ Encrypt a value with a configured key.
 gas secret
 gas secret --key production
 gas secret --key production --value "my-secret"
-gas secret --key production --name SECRET_KEY --value "my-secret"
 ```
 
 ## Output
 
-Without `--name`:
-
 ```txt
 encrypted:production:abcdefghijk
-```
-
-With `--name`:
-
-```txt
-SECRET_KEY=encrypted:production:abcdefghijk
 ```
 
 ## Example
@@ -58,7 +49,7 @@ export const keys = defineKeys({
 Encrypt a value:
 
 ```sh
-gas secret --key production --name SECRET_KEY --value "super-secret-value"
+gas secret --key production --value "super-secret-value"
 ```
 
 Then use it:
@@ -85,5 +76,4 @@ export async function getRootApiParams() {
 
 - If `--key` is omitted, Gas will prompt for it.
 - If `--value` is omitted, Gas will prompt for it.
-- `--name` is optional.
 - The command uses the selected key's public key.
