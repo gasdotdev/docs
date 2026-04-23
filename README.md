@@ -12,6 +12,7 @@ A framework for creating, deploying, and managing Cloudflare-infused projects wi
 ## Core
 
 - [Keys](./docs/keys.md)
+- [Secret Command](./docs/secret-command.md)
 
 ## AWS Plugin
 
