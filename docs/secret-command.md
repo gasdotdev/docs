@@ -26,17 +26,17 @@ export const keys = defineKeys({
 	development: {
 		public: {
 			from: 'file',
-			path: './gas/_keys/development.public',
+			path: './development.public',
 		},
 		private: {
 			from: 'file',
-			path: './gas/_keys/development.private',
+			path: './development.private',
 		},
 	},
 	production: {
 		public: {
 			from: 'file',
-			path: './gas/_keys/production.public',
+			path: './production.public',
 		},
 		private: {
 			from: 'env',
