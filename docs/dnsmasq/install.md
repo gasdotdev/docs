@@ -1,6 +1,6 @@
 # dnsmasq Install
 
-`dnsmasq` is used for local development hostnames like `app.test`, `api.test`, or `foo.bar.test`.
+`dnsmasq` is used for local development hostnames like `app.localhost`, `api.localhost`, or `foo.bar.localhost`.
 
 ## macOS Setup
 
@@ -18,9 +18,7 @@ Update the `dnsmasq` config:
 Add:
 
 ```conf
-listen-address=127.0.0.1
-bind-interfaces
-address=/.test/127.0.0.1
+address=/localhost/127.0.0.1
 ```
 
 Start the service:
@@ -31,11 +29,11 @@ sudo brew services start dnsmasq
 
 `sudo brew services start dnsmasq` registers `dnsmasq` with `launchd`, so it should start automatically on system startup.
 
-Tell macOS to use `dnsmasq` for `.test` domains:
+Tell macOS to use `dnsmasq` for `.localhost` names:
 
 ```bash
 sudo mkdir -p /etc/resolver
-printf "nameserver 127.0.0.1\n" | sudo tee /etc/resolver/test >/dev/null
+echo 'nameserver 127.0.0.1' | sudo tee /etc/resolver/localhost
 ```
 
 ## Linux Setup
