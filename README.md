@@ -2,7 +2,7 @@
 
 ## ?
 
-A simple framework for creating, deploying, and managing Cloudflare-infused projects with type-safe code.
+A simple framework for creating, testing, deploying, and managing Cloudflare-infused projects with type-safe code.
 
 ## Requirements
 
